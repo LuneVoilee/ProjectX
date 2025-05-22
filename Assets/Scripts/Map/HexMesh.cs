@@ -465,7 +465,7 @@ public class HexMesh : MonoBehaviour
         var sample = HexUtil.SampleNoise(position);
         sample = (sample * 2f - Vector4.one) * HexUtil.PerturbStrength;
         position.x += sample.x;
-        position.y += sample.y;
+        //平整地面 //position.y += sample.y;
         position.z += sample.z;
         return position;
     }
