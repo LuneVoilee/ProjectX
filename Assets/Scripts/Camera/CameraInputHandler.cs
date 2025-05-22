@@ -53,10 +53,10 @@ namespace Camera
         private void OnClick(InputAction.CallbackContext context)
         {
             if (KInput.IsPointerOverUI()) return;
-            
+
             var mainCamera = KInput.MainCamera;
             if (!mainCamera) return;
-            
+
             var mousePosition = Mouse.current.position.ReadValue();
 
             var inputRay = mainCamera.ScreenPointToRay(new Vector3(mousePosition.x, mousePosition.y, 0f));
@@ -107,7 +107,8 @@ namespace Camera
             var readValue = m_PlayerAction.Move.ReadValue<Vector2>();
             if (readValue.magnitude.Equals(0)) return;
 
-            var moveDirection = (Vector3.right * readValue.x + Vector3.forward * readValue.y).normalized;
+            var moveDirection = (m_CameraTransform.right * readValue.x + m_CameraTransform.forward * readValue.y)
+                .normalized;
             m_CameraTransform.position += moveDirection * (MoveSpeed * Time.deltaTime);
         }
     }
