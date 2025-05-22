@@ -207,7 +207,7 @@ public class HexMesh : MonoBehaviour
             if (leftCell.Height < rightCell.Height)
             {
                 HandleCase_OneTerracesAndOneCliff(
-                    right, rightCell, bottom, bottomCell, left, leftCell, false
+                    right, rightCell, left, leftCell, bottom, bottomCell, false
                 );
             }
             else
@@ -292,20 +292,20 @@ public class HexMesh : MonoBehaviour
         var v2 = Perturb(HexUtil.TerraceLerp(begin, left, 1));
         var c2 = HexUtil.TerraceLerp(beginCell.Color, leftCell.Color, 1);
 
-        AddTriangleUnperturbed(begin, v2, boundary, isClockwise);
+        AddTriangleUnperturbed(Perturb(begin), v2, boundary, isClockwise);
         AddTriangleColor(beginCell.Color, c2, boundaryColor, isClockwise);
 
         for (var i = 2; i < HexUtil.terraceSteps; i++)
         {
             Vector3 v1 = v2;
             Color c1 = c2;
-            v2 = HexUtil.TerraceLerp(begin, left, i);
+            v2 = Perturb(HexUtil.TerraceLerp(begin, left, i));
             c2 = HexUtil.TerraceLerp(beginCell.Color, leftCell.Color, i);
             AddTriangleUnperturbed(v1, v2, boundary, isClockwise);
             AddTriangleColor(c1, c2, boundaryColor, isClockwise);
         }
 
-        AddTriangleUnperturbed(v2, left, boundary, isClockwise);
+        AddTriangleUnperturbed(v2, Perturb(left), boundary, isClockwise);
         AddTriangleColor(c2, leftCell.Color, boundaryColor, isClockwise);
     }
 
