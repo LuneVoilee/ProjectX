@@ -48,10 +48,10 @@ public class HexMesh : MonoBehaviour
     {
         for (var dir = HexDirection.NE; dir <= HexDirection.NW; dir++)
         {
-            var center = cell.transform.localPosition;
+            var center = cell.Position;
 
-            var v1 = center + HexConfig.GetFirstSolidVector(dir);
-            var v2 = center + HexConfig.GetSecondSolidVector(dir);
+            var v1 = center + HexUtil.GetFirstSolidVector(dir);
+            var v2 = center + HexUtil.GetSecondSolidVector(dir);
             AddTriangle
             (
                 center,
@@ -77,10 +77,10 @@ public class HexMesh : MonoBehaviour
         if (!cell.GetNeighbor(dir, out var neighbor))
             return;
 
-        var bridge = HexConfig.GetBridge(dir);
+        var bridge = HexUtil.GetBridge(dir);
         var v3 = v1 + bridge;
         var v4 = v2 + bridge;
-        v3.y = v4.y = neighbor.Height * HexConfig.HeightStep;
+        v3.y = v4.y = neighbor.Position.y;
 
         if (cell.GetEdgeType(dir) == HexEdgeType.Slope)
         {
@@ -95,8 +95,8 @@ public class HexMesh : MonoBehaviour
 
         if (dir > HexDirection.E || !cell.GetNeighbor(dir.Next(), out var nextNeighbor))
             return;
-        var v5 = v2 + HexConfig.GetBridge(dir.Next());
-        v5.y = nextNeighbor.Height * HexConfig.HeightStep;
+        var v5 = v2 + HexUtil.GetBridge(dir.Next());
+        v5.y = nextNeighbor.Position.y;
 
         if (cell.Height <= neighbor.Height)
         {
@@ -125,21 +125,21 @@ public class HexMesh : MonoBehaviour
         Vector3 endLeft, Vector3 endRight, HexCell endCell
     )
     {
-        Vector3 v3 = HexConfig.TerraceLerp(beginLeft, endLeft, 1);
-        Vector3 v4 = HexConfig.TerraceLerp(beginRight, endRight, 1);
-        Color c2 = HexConfig.TerraceLerp(beginCell.Color, endCell.Color, 1);
+        Vector3 v3 = HexUtil.TerraceLerp(beginLeft, endLeft, 1);
+        Vector3 v4 = HexUtil.TerraceLerp(beginRight, endRight, 1);
+        Color c2 = HexUtil.TerraceLerp(beginCell.Color, endCell.Color, 1);
 
         AddQuad(beginLeft, beginRight, v3, v4);
         AddQuadColor(beginCell.Color, c2);
 
-        for (var i = 2; i < HexConfig.terraceSteps; i++)
+        for (var i = 2; i < HexUtil.terraceSteps; i++)
         {
             var v1 = v3;
             var v2 = v4;
             var c1 = c2;
-            v3 = HexConfig.TerraceLerp(beginLeft, endLeft, i);
-            v4 = HexConfig.TerraceLerp(beginRight, endRight, i);
-            c2 = HexConfig.TerraceLerp(beginCell.Color, endCell.Color, i);
+            v3 = HexUtil.TerraceLerp(beginLeft, endLeft, i);
+            v4 = HexUtil.TerraceLerp(beginRight, endRight, i);
+            c2 = HexUtil.TerraceLerp(beginCell.Color, endCell.Color, i);
             AddQuad(v1, v2, v3, v4);
             AddQuadColor(c1, c2);
         }
@@ -224,24 +224,24 @@ public class HexMesh : MonoBehaviour
         Vector3 right, HexCell rightCell
     )
     {
-        Vector3 v3 = HexConfig.TerraceLerp(begin, left, 1);
-        Vector3 v4 = HexConfig.TerraceLerp(begin, right, 1);
-        Color c3 = HexConfig.TerraceLerp(beginCell.Color, leftCell.Color, 1);
-        Color c4 = HexConfig.TerraceLerp(beginCell.Color, rightCell.Color, 1);
+        Vector3 v3 = HexUtil.TerraceLerp(begin, left, 1);
+        Vector3 v4 = HexUtil.TerraceLerp(begin, right, 1);
+        Color c3 = HexUtil.TerraceLerp(beginCell.Color, leftCell.Color, 1);
+        Color c4 = HexUtil.TerraceLerp(beginCell.Color, rightCell.Color, 1);
 
         AddTriangle(begin, v3, v4);
         AddTriangleColor(beginCell.Color, c3, c4);
 
-        for (var i = 2; i < HexConfig.terraceSteps; i++)
+        for (var i = 2; i < HexUtil.terraceSteps; i++)
         {
             Vector3 v1 = v3;
             Vector3 v2 = v4;
             Color c1 = c3;
             Color c2 = c4;
-            v3 = HexConfig.TerraceLerp(begin, left, i);
-            v4 = HexConfig.TerraceLerp(begin, right, i);
-            c3 = HexConfig.TerraceLerp(beginCell.Color, leftCell.Color, i);
-            c4 = HexConfig.TerraceLerp(beginCell.Color, rightCell.Color, i);
+            v3 = HexUtil.TerraceLerp(begin, left, i);
+            v4 = HexUtil.TerraceLerp(begin, right, i);
+            c3 = HexUtil.TerraceLerp(beginCell.Color, leftCell.Color, i);
+            c4 = HexUtil.TerraceLerp(beginCell.Color, rightCell.Color, i);
             AddQuad(v1, v2, v3, v4);
             AddQuadColor(c1, c2, c3, c4);
         }
@@ -280,18 +280,18 @@ public class HexMesh : MonoBehaviour
     private void HandleCliffDetail(Vector3 begin, HexCell beginCell, Vector3 left, HexCell leftCell,
         Vector3 boundary, Color boundaryColor, bool isClockwise)
     {
-        var v2 = HexConfig.TerraceLerp(begin, left, 1);
-        var c2 = HexConfig.TerraceLerp(beginCell.Color, leftCell.Color, 1);
+        var v2 = HexUtil.TerraceLerp(begin, left, 1);
+        var c2 = HexUtil.TerraceLerp(beginCell.Color, leftCell.Color, 1);
 
         AddTriangle(begin, v2, boundary, isClockwise);
         AddTriangleColor(beginCell.Color, c2, boundaryColor, isClockwise);
 
-        for (var i = 2; i < HexConfig.terraceSteps; i++)
+        for (var i = 2; i < HexUtil.terraceSteps; i++)
         {
             Vector3 v1 = v2;
             Color c1 = c2;
-            v2 = HexConfig.TerraceLerp(begin, left, i);
-            c2 = HexConfig.TerraceLerp(beginCell.Color, leftCell.Color, i);
+            v2 = HexUtil.TerraceLerp(begin, left, i);
+            c2 = HexUtil.TerraceLerp(beginCell.Color, leftCell.Color, i);
             AddTriangle(v1, v2, boundary, isClockwise);
             AddTriangleColor(c1, c2, boundaryColor, isClockwise);
         }
@@ -310,15 +310,15 @@ public class HexMesh : MonoBehaviour
         var vertexIndex = m_Vertices.Count;
         if (isClockwise)
         {
-            m_Vertices.Add(v1);
-            m_Vertices.Add(v2);
-            m_Vertices.Add(v3);
+            m_Vertices.Add(Perturb(v1));
+            m_Vertices.Add(Perturb(v2));
+            m_Vertices.Add(Perturb(v3));
         }
         else
         {
-            m_Vertices.Add(v1);
-            m_Vertices.Add(v3);
-            m_Vertices.Add(v2);
+            m_Vertices.Add(Perturb(v1));
+            m_Vertices.Add(Perturb(v3));
+            m_Vertices.Add(Perturb(v2));
         }
 
         m_Triangles.Add(vertexIndex);
@@ -350,13 +350,15 @@ public class HexMesh : MonoBehaviour
     void AddQuad(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4)
     {
         int vertexIndex = m_Vertices.Count;
-        m_Vertices.Add(v1);
-        m_Vertices.Add(v2);
-        m_Vertices.Add(v3);
-        m_Vertices.Add(v4);
+        m_Vertices.Add(Perturb(v1));
+        m_Vertices.Add(Perturb(v2));
+        m_Vertices.Add(Perturb(v3));
+        m_Vertices.Add(Perturb(v4));
+
         m_Triangles.Add(vertexIndex);
         m_Triangles.Add(vertexIndex + 2);
         m_Triangles.Add(vertexIndex + 1);
+
         m_Triangles.Add(vertexIndex + 1);
         m_Triangles.Add(vertexIndex + 2);
         m_Triangles.Add(vertexIndex + 3);
@@ -376,6 +378,20 @@ public class HexMesh : MonoBehaviour
         m_Colors.Add(c2);
         m_Colors.Add(c3);
         m_Colors.Add(c4);
+    }
+
+    #endregion
+
+    #region Noise
+
+    Vector3 Perturb(Vector3 position)
+    {
+        var sample = HexUtil.SampleNoise(position);
+        sample = (sample * 2f - Vector4.one) * HexUtil.PerturbStrength;
+        position.x += sample.x;
+        position.y += sample.y;
+        position.z += sample.z;
+        return position;
     }
 
     #endregion

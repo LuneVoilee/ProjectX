@@ -56,10 +56,10 @@
     <Compile Include="Assets\Scripts\Map\HexCell.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraInputHandler.cs" />
     <Compile Include="Assets\Scripts\Input\KInputAction.cs" />
+    <Compile Include="Assets\Scripts\Map\HexUtil.cs" />
     <Compile Include="Assets\Scripts\UI\MapEditor.cs" />
     <Compile Include="Assets\Scripts\Map\HexMesh.cs" />
     <Compile Include="Assets\Scripts\Map\HexCoordinates.cs" />
-    <Compile Include="Assets\Scripts\Map\HexConfig.cs" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />

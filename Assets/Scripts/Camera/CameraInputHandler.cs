@@ -107,7 +107,7 @@ namespace Camera
             var readValue = m_PlayerAction.Move.ReadValue<Vector2>();
             if (readValue.magnitude.Equals(0)) return;
 
-            var moveDirection = (m_CameraTransform.right * readValue.x + m_CameraTransform.forward * readValue.y)
+            var moveDirection = (m_CameraTransform.right * readValue.x + m_CameraTransform.up * readValue.y)
                 .normalized;
             m_CameraTransform.position += moveDirection * (MoveSpeed * Time.deltaTime);
         }

@@ -119,6 +119,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!224 &5 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5946970981089405034, guid: 73ca14a5cb45d134390a1a3b28249e05, type: 3}
+  m_PrefabInstance: {fileID: 4126448236588025668}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &216990238
 GameObject:
   m_ObjectHideFlags: 0
@@ -292,7 +297,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2232979767013832120}
+  - {fileID: 5}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -614,7 +619,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.1}
+  m_AnchoredPosition: {x: 0, y: 2}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &832575517
@@ -794,6 +799,7 @@ MonoBehaviour:
   CellPrefab: {fileID: 1258254489003315472, guid: 913a0b1be4af0674d8022ff3114e8e9f, type: 3}
   InfoLabelPrefab: {fileID: 3168454151338733075, guid: 7b14cfdf6376c1b4b8be18ef54ee3b6b, type: 3}
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  NoiseSource: {fileID: 2800000, guid: 2593a82311ebdce40bad7d0198e7ebf8, type: 3}
 --- !u!4 &1934926445
 Transform:
   m_ObjectHideFlags: 0
@@ -811,11 +817,6 @@ Transform:
   - {fileID: 1043491758}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!224 &2232979767013832120 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 5946970981089405034, guid: 73ca14a5cb45d134390a1a3b28249e05, type: 3}
-  m_PrefabInstance: {fileID: 4126448236588025668}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4126448236588025668
 PrefabInstance:
   m_ObjectHideFlags: 0

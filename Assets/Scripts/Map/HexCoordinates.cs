@@ -35,10 +35,10 @@ namespace Map
 
         public static HexCoordinates FromPosition(Vector3 position)
         {
-            var x = position.x / (HexConfig.InnerRadius * 2f);
+            var x = position.x / (HexUtil.InnerRadius * 2f);
             var y = -x;
 
-            var offset = position.z / (HexConfig.OuterRadius * 3f);
+            var offset = position.z / (HexUtil.OuterRadius * 3f);
             x -= offset;
             y -= offset;
 

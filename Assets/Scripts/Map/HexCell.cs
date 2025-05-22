@@ -17,14 +17,19 @@ namespace Map
             {
                 m_Height = value;
                 Vector3 position = transform.localPosition;
-                position.y = value * HexConfig.HeightStep;
+                position.y = value * HexUtil.HeightStep;
+                position.y +=
+                    (HexUtil.SampleNoise(position).y * 2f - 1f) *
+                    HexUtil.HeightPerturbStrength;
                 transform.localPosition = position;
 
                 Vector3 uiPos = UITransform.localPosition;
-                uiPos.z = m_Height * -HexConfig.HeightStep;
+                uiPos.z = m_Height * -HexUtil.HeightStep;
                 UITransform.localPosition = uiPos;
             }
         }
+
+        public Vector3 Position => transform.localPosition;
 
         private int m_Height;
 
@@ -50,7 +55,7 @@ namespace Map
 
         public HexEdgeType GetEdgeType(HexDirection direction)
         {
-            return HexConfig.GetEdgeType(
+            return HexUtil.GetEdgeType(
                 Height, neighbors[(int)direction].Height
             );
         }
@@ -58,7 +63,7 @@ namespace Map
 
         public HexEdgeType GetEdgeType(HexCell other)
         {
-            return HexConfig.GetEdgeType(
+            return HexUtil.GetEdgeType(
                 Height, other.Height
             );
         }

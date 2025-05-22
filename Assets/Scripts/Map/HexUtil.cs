@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Map
 {
-    public static class HexConfig
+    public static class HexUtil
     {
         public const float OuterRadius = 10f;
 
@@ -24,6 +24,8 @@ namespace Map
             new(-InnerRadius, 0f, 0.5f * OuterRadius),
             new(0f, 0f, OuterRadius)
         };
+
+        public const float HeightPerturbStrength = 1.5f;
 
         public static Vector3 GetFirstVector(HexDirection direction)
         {
@@ -90,6 +92,23 @@ namespace Map
             }
 
             return HexEdgeType.Cliff;
+        }
+
+        #endregion
+
+        #region Noise
+
+        public const float PerturbStrength = 5f;
+
+        public const float NoiseScale = 0.003f;
+        public static Texture2D NoiseSource;
+
+        public static Vector4 SampleNoise(Vector3 position)
+        {
+            return NoiseSource.GetPixelBilinear(
+                position.x * NoiseScale,
+                position.z * NoiseScale
+            );
         }
 
         #endregion

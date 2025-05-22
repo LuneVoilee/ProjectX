@@ -9,17 +9,30 @@ namespace Map
 {
     public class HexMapGenerateSystem : MonoBehaviour
     {
+        public static HexMapGenerateSystem Instance;
+
         public int Width = 6;
         public int Height = 6;
 
         public HexCell CellPrefab;
         public Text InfoLabelPrefab;
-        public static HexMapGenerateSystem Instance;
         public Color defaultColor = Color.white;
+        public Texture2D NoiseSource;
 
         private HexCell[] m_Cells;
         private HexMesh m_HexMesh;
         private Canvas m_InfoCanvas;
+
+        //在 OnEnable 事件方法中重新分配纹理。该方法将在重新编译后被调用。
+        private void OnEnable()
+        {
+            HexUtil.NoiseSource = NoiseSource;
+        }
+
+        private void OnDisable()
+        {
+            HexUtil.NoiseSource = null;
+        }
 
         private void Awake()
         {
@@ -27,6 +40,8 @@ namespace Map
             m_HexMesh = GetComponentInChildren<HexMesh>();
 
             m_Cells = new HexCell[Height * Width];
+
+            HexUtil.NoiseSource = NoiseSource;
 
             for (int z = 0, i = 0; z < Height; z++)
             {
@@ -52,9 +67,9 @@ namespace Map
         private void CreateCell(int x, int z, int i)
         {
             Vector3 position;
-            position.x = (x + z * 0.5f - z / 2) * (HexConfig.InnerRadius * 2f);
+            position.x = (x + z * 0.5f - z / 2) * (HexUtil.InnerRadius * 2f);
             position.y = 0f;
-            position.z = z * (HexConfig.OuterRadius * 1.5f);
+            position.z = z * (HexUtil.OuterRadius * 1.5f);
 
             var cell = m_Cells[i] = Instantiate(CellPrefab);
             cell.transform.SetParent(transform, false);
@@ -70,6 +85,9 @@ namespace Map
                 new Vector2(position.x, position.z);
             label.text = cell.coordinates.ToStringOnSeparateLines();
             cell.UITransform = label.rectTransform;
+
+            //应用扰动
+            cell.Height = 1;
         }
 
         private void SetNeighbors(int x, int z, int i, HexCell cell)
