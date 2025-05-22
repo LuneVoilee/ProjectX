@@ -23,6 +23,7 @@ public class HexMesh : MonoBehaviour
         m_Colors = new List<Color>();
     }
 
+
     public void Triangulate(HexCell[] cells)
     {
         m_Mesh.Clear();
@@ -52,24 +53,20 @@ public class HexMesh : MonoBehaviour
 
             var v1 = center + HexUtil.GetFirstSolidVector(dir);
             var v2 = center + HexUtil.GetSecondSolidVector(dir);
-            AddTriangle
-            (
-                center,
-                v1,
-                v2
-            );
-            AddTriangleColor(cell.Color);
+            EdgeVertices e = new EdgeVertices(v1, v2);
+
+            AddTriangleByEdge(center, e, cell.Color);
 
             if (dir <= HexDirection.SE)
             {
-                AddBridgeAndCorner(cell, dir, v1, v2);
+                AddBridgeAndCorner(cell, dir, e);
             }
         }
     }
 
     #region 梯田相关Bridge&&Corner
 
-    private void AddBridgeAndCorner(HexCell cell, HexDirection dir, Vector3 v1, Vector3 v2)
+    private void AddBridgeAndCorner(HexCell cell, HexDirection dir, EdgeVertices e1)
     {
         if (cell.coordinates.X == 3 && cell.coordinates.Z == 3)
             Debug.Log("1");
@@ -78,77 +75,81 @@ public class HexMesh : MonoBehaviour
             return;
 
         var bridge = HexUtil.GetBridge(dir);
-        var v3 = v1 + bridge;
-        var v4 = v2 + bridge;
+        var v3 = e1.v1 + bridge;
+        var v4 = e1.v4 + bridge;
         v3.y = v4.y = neighbor.Position.y;
+        EdgeVertices e2 = new EdgeVertices(v3, v4);
 
+        //梯田Bridge
         if (cell.GetEdgeType(dir) == HexEdgeType.Slope)
         {
-            TriangulateSlopeBridge(v1, v2, cell, v3, v4, neighbor);
+            HandleSlope(e1, cell, e2, neighbor);
         }
+        //斜面Bridge
         else
         {
-            AddQuad(v1, v2, v3, v4);
-            AddQuadColor(cell.Color, neighbor.Color);
+            AddQuadByEdge(e1, cell.Color, e2, neighbor.Color);
         }
 
 
         if (dir > HexDirection.E || !cell.GetNeighbor(dir.Next(), out var nextNeighbor))
             return;
-        var v5 = v2 + HexUtil.GetBridge(dir.Next());
+        var v5 = e1.v4 + HexUtil.GetBridge(dir.Next());
         v5.y = nextNeighbor.Position.y;
 
-        if (cell.Height <= neighbor.Height)
+        var IsCellLowerOrEqualToNeighbor = cell.Height <= neighbor.Height;
+        var IsCellLowerThanNextNeighbor = cell.Height < nextNeighbor.Height;
+        var IsNeighborLowerOrEqualToNextNeighbor = neighbor.Height <= nextNeighbor.Height;
+
+        //cell最矮
+        if (IsCellLowerOrEqualToNeighbor && IsCellLowerThanNextNeighbor)
         {
-            if (cell.Height < nextNeighbor.Height)
-            {
-                TriangulateCorner(v2, cell, v4, neighbor, v5, nextNeighbor);
-            }
-            else
-            {
-                TriangulateCorner(v5, nextNeighbor, v2, cell, v4, neighbor);
-            }
+            HandleCorner(e1.v4, cell, v4, neighbor, v5, nextNeighbor);
+            return;
         }
-        else if (neighbor.Height <= nextNeighbor.Height)
+
+        //NextNeighbor最矮(Cell<=Neighbor时)
+        if (IsCellLowerOrEqualToNeighbor)
         {
-            TriangulateCorner(v4, neighbor, v5, nextNeighbor, v2, cell);
+            HandleCorner(v5, nextNeighbor, e1.v4, cell, v4, neighbor);
+            return;
         }
-        else
+
+        //Neighbor最矮
+        if (IsNeighborLowerOrEqualToNextNeighbor)
         {
-            TriangulateCorner(v5, nextNeighbor, v2, cell, v4, neighbor);
+            HandleCorner(v4, neighbor, v5, nextNeighbor, e1.v4, cell);
+            return;
         }
+
+        //NextNeighbor最矮(Cell>Neighbor时)
+        HandleCorner(v5, nextNeighbor, e1.v4, cell, v4, neighbor);
     }
 
 
-    void TriangulateSlopeBridge(
-        Vector3 beginLeft, Vector3 beginRight, HexCell beginCell,
-        Vector3 endLeft, Vector3 endRight, HexCell endCell
+    void HandleSlope(
+        EdgeVertices begin, HexCell beginCell,
+        EdgeVertices end, HexCell endCell
     )
     {
-        Vector3 v3 = HexUtil.TerraceLerp(beginLeft, endLeft, 1);
-        Vector3 v4 = HexUtil.TerraceLerp(beginRight, endRight, 1);
+        EdgeVertices e2 = EdgeVertices.TerraceLerp(begin, end, 1);
         Color c2 = HexUtil.TerraceLerp(beginCell.Color, endCell.Color, 1);
 
-        AddQuad(beginLeft, beginRight, v3, v4);
-        AddQuadColor(beginCell.Color, c2);
+        AddQuadByEdge(begin, beginCell.Color, e2, c2);
 
-        for (var i = 2; i < HexUtil.terraceSteps; i++)
+        for (int i = 2; i < HexUtil.terraceSteps; i++)
         {
-            var v1 = v3;
-            var v2 = v4;
-            var c1 = c2;
-            v3 = HexUtil.TerraceLerp(beginLeft, endLeft, i);
-            v4 = HexUtil.TerraceLerp(beginRight, endRight, i);
+            EdgeVertices e1 = e2;
+            Color c1 = c2;
+            e2 = EdgeVertices.TerraceLerp(begin, end, i);
             c2 = HexUtil.TerraceLerp(beginCell.Color, endCell.Color, i);
-            AddQuad(v1, v2, v3, v4);
-            AddQuadColor(c1, c2);
+            AddQuadByEdge(e1, c1, e2, c2);
         }
 
-        AddQuad(v3, v4, endLeft, endRight);
-        AddQuadColor(c2, endCell.Color);
+        AddQuadByEdge(e2, c2, end, endCell.Color);
     }
 
-    void TriangulateCorner(
+    void HandleCorner(
         Vector3 bottom, HexCell bottomCell,
         Vector3 left, HexCell leftCell,
         Vector3 right, HexCell rightCell
@@ -161,36 +162,41 @@ public class HexMesh : MonoBehaviour
         {
             if (rightEdgeType == HexEdgeType.Slope)
             {
-                TriangulateCornerTerraces(
+                //左右皆梯田
+                HandleCase_TwoTerraces(
                     bottom, bottomCell, left, leftCell, right, rightCell
                 );
             }
 
             else if (rightEdgeType == HexEdgeType.Flat)
             {
-                TriangulateCornerTerraces(
+                //左梯田右平地
+                //HandleCase_TwoTerraces处理插值时不分高低，所有可以把leftCell当作bottom用放在第一个
+                HandleCase_TwoTerraces(
                     left, leftCell, right, rightCell, bottom, bottomCell
                 );
             }
 
             else
             {
-                TriangulateCornerTerracesCliff(
+                //左梯田右悬崖
+                HandleCase_OneTerracesAndOneCliff(
                     bottom, bottomCell, left, leftCell, right, rightCell
                 );
             }
         }
+        //同理
         else if (rightEdgeType == HexEdgeType.Slope)
         {
             if (leftEdgeType == HexEdgeType.Flat)
             {
-                TriangulateCornerTerraces(
+                HandleCase_TwoTerraces(
                     right, rightCell, bottom, bottomCell, left, leftCell
                 );
             }
             else
             {
-                TriangulateCornerTerracesCliff(
+                HandleCase_OneTerracesAndOneCliff(
                     bottom, bottomCell, right, rightCell, left, leftCell, false
                 );
             }
@@ -200,17 +206,18 @@ public class HexMesh : MonoBehaviour
         {
             if (leftCell.Height < rightCell.Height)
             {
-                TriangulateCornerTerracesCliff(
+                HandleCase_OneTerracesAndOneCliff(
                     right, rightCell, bottom, bottomCell, left, leftCell, false
                 );
             }
             else
             {
-                TriangulateCornerTerracesCliff(
+                HandleCase_OneTerracesAndOneCliff(
                     left, leftCell, right, rightCell, bottom, bottomCell
                 );
             }
         }
+        //三Cell之间没有梯田，用三角形正常处理
         else
         {
             AddTriangle(bottom, left, right);
@@ -218,7 +225,7 @@ public class HexMesh : MonoBehaviour
         }
     }
 
-    void TriangulateCornerTerraces(
+    void HandleCase_TwoTerraces(
         Vector3 begin, HexCell beginCell,
         Vector3 left, HexCell leftCell,
         Vector3 right, HexCell rightCell
@@ -250,40 +257,42 @@ public class HexMesh : MonoBehaviour
         AddQuadColor(c3, c4, leftCell.Color, rightCell.Color);
     }
 
-    void TriangulateCornerTerracesCliff(
+    void HandleCase_OneTerracesAndOneCliff(
         Vector3 begin, HexCell beginCell,
         Vector3 left, HexCell leftCell,
         Vector3 right, HexCell rightCell, bool isClockwise = true
     )
     {
         var b = Mathf.Abs(1f / (rightCell.Height - beginCell.Height));
-        var boundary = Vector3.Lerp(begin, right, b);
+        var boundary = Vector3.Lerp(Perturb(begin), Perturb(right), b);
         var boundaryColor = Color.Lerp(beginCell.Color, rightCell.Color, b);
 
-        //处理底-悬崖
-        HandleCliffDetail(begin, beginCell, left, leftCell, boundary, boundaryColor, isClockwise);
+        //处理底-左 (梯田)
+        HandleCase_TerracesCorner(begin, beginCell, left, leftCell, boundary, boundaryColor, isClockwise);
 
-        //处理左-悬崖
+        //处理左-右
+        //左->右是梯田
         if (leftCell.GetEdgeType(rightCell) == HexEdgeType.Slope)
         {
-            HandleCliffDetail(
+            HandleCase_TerracesCorner(
                 left, leftCell, right, rightCell, boundary, boundaryColor, isClockwise
             );
         }
+        //左->右是悬崖
         else
         {
-            AddTriangle(left, right, boundary, isClockwise);
+            AddTriangleUnperturbed(Perturb(left), Perturb(right), boundary, isClockwise);
             AddTriangleColor(leftCell.Color, rightCell.Color, boundaryColor, isClockwise);
         }
     }
 
-    private void HandleCliffDetail(Vector3 begin, HexCell beginCell, Vector3 left, HexCell leftCell,
+    private void HandleCase_TerracesCorner(Vector3 begin, HexCell beginCell, Vector3 left, HexCell leftCell,
         Vector3 boundary, Color boundaryColor, bool isClockwise)
     {
-        var v2 = HexUtil.TerraceLerp(begin, left, 1);
+        var v2 = Perturb(HexUtil.TerraceLerp(begin, left, 1));
         var c2 = HexUtil.TerraceLerp(beginCell.Color, leftCell.Color, 1);
 
-        AddTriangle(begin, v2, boundary, isClockwise);
+        AddTriangleUnperturbed(begin, v2, boundary, isClockwise);
         AddTriangleColor(beginCell.Color, c2, boundaryColor, isClockwise);
 
         for (var i = 2; i < HexUtil.terraceSteps; i++)
@@ -292,18 +301,18 @@ public class HexMesh : MonoBehaviour
             Color c1 = c2;
             v2 = HexUtil.TerraceLerp(begin, left, i);
             c2 = HexUtil.TerraceLerp(beginCell.Color, leftCell.Color, i);
-            AddTriangle(v1, v2, boundary, isClockwise);
+            AddTriangleUnperturbed(v1, v2, boundary, isClockwise);
             AddTriangleColor(c1, c2, boundaryColor, isClockwise);
         }
 
-        AddTriangle(v2, left, boundary, isClockwise);
+        AddTriangleUnperturbed(v2, left, boundary, isClockwise);
         AddTriangleColor(c2, leftCell.Color, boundaryColor, isClockwise);
     }
 
     #endregion
 
 
-    #region 辅助方法
+    #region 辅助
 
     private void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3, bool isClockwise = true)
     {
@@ -319,6 +328,27 @@ public class HexMesh : MonoBehaviour
             m_Vertices.Add(Perturb(v1));
             m_Vertices.Add(Perturb(v3));
             m_Vertices.Add(Perturb(v2));
+        }
+
+        m_Triangles.Add(vertexIndex);
+        m_Triangles.Add(vertexIndex + 1);
+        m_Triangles.Add(vertexIndex + 2);
+    }
+
+    void AddTriangleUnperturbed(Vector3 v1, Vector3 v2, Vector3 v3, bool isClockwise = true)
+    {
+        var vertexIndex = m_Vertices.Count;
+        if (isClockwise)
+        {
+            m_Vertices.Add(v1);
+            m_Vertices.Add(v2);
+            m_Vertices.Add(v3);
+        }
+        else
+        {
+            m_Vertices.Add(v1);
+            m_Vertices.Add(v3);
+            m_Vertices.Add(v2);
         }
 
         m_Triangles.Add(vertexIndex);
@@ -378,6 +408,52 @@ public class HexMesh : MonoBehaviour
         m_Colors.Add(c2);
         m_Colors.Add(c3);
         m_Colors.Add(c4);
+    }
+
+    public struct EdgeVertices
+    {
+        public Vector3 v1, v2, v3, v4;
+
+        public EdgeVertices(Vector3 v1, Vector3 v2)
+        {
+            this.v1 = v1;
+            this.v2 = Vector3.Lerp(v1, v2, 1f / 3f);
+            v3 = Vector3.Lerp(v1, v2, 2f / 3f);
+            v4 = v2;
+        }
+
+        public static EdgeVertices TerraceLerp(EdgeVertices a, EdgeVertices b, int step)
+        {
+            EdgeVertices result;
+            result.v1 = HexUtil.TerraceLerp(a.v1, b.v1, step);
+            result.v2 = HexUtil.TerraceLerp(a.v2, b.v2, step);
+            result.v3 = HexUtil.TerraceLerp(a.v3, b.v3, step);
+            result.v4 = HexUtil.TerraceLerp(a.v4, b.v4, step);
+            return result;
+        }
+    }
+
+    void AddTriangleByEdge(Vector3 center, EdgeVertices edge, Color color)
+    {
+        AddTriangle(center, edge.v1, edge.v2);
+        AddTriangleColor(color);
+        AddTriangle(center, edge.v2, edge.v3);
+        AddTriangleColor(color);
+        AddTriangle(center, edge.v3, edge.v4);
+        AddTriangleColor(color);
+    }
+
+    void AddQuadByEdge(
+        EdgeVertices e1, Color c1,
+        EdgeVertices e2, Color c2
+    )
+    {
+        AddQuad(e1.v1, e1.v2, e2.v1, e2.v2);
+        AddQuadColor(c1, c2);
+        AddQuad(e1.v2, e1.v3, e2.v2, e2.v3);
+        AddQuadColor(c1, c2);
+        AddQuad(e1.v3, e1.v4, e2.v3, e2.v4);
+        AddQuadColor(c1, c2);
     }
 
     #endregion

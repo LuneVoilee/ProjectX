@@ -5,11 +5,13 @@ namespace Map
 {
     public static class HexUtil
     {
+        #region HexCell
+
         public const float OuterRadius = 10f;
 
         public const float InnerRadius = OuterRadius * 0.866025404f;
 
-        public const float SolidFactor = 0.75f;
+        public const float SolidFactor = 0.8f;
 
         public const float BlendFactor = 1f - SolidFactor;
 
@@ -51,6 +53,9 @@ namespace Map
         {
             return (VerticesDir[(int)direction] + VerticesDir[(int)direction + 1]) * BlendFactor;
         }
+
+        #endregion
+
 
         #region Height
 
@@ -96,9 +101,10 @@ namespace Map
 
         #endregion
 
+
         #region Noise
 
-        public const float PerturbStrength = 5f;
+        public const float PerturbStrength = 4f;
 
         public const float NoiseScale = 0.003f;
         public static Texture2D NoiseSource;
