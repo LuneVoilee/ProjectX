@@ -87,7 +87,7 @@ namespace Map
             cell.UITransform = label.rectTransform;
 
             //应用扰动
-            cell.Height = 1;
+            cell.Height = 0;
         }
 
         private void SetNeighbors(int x, int z, int i, HexCell cell)

@@ -429,6 +429,8 @@ MonoBehaviour:
   RotationSpeed: 80
   MinHeight: 30
   MaxHeight: 80
+  MinPitch: -80
+  MaxPitch: 80
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -619,7 +621,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 2}
+  m_AnchoredPosition: {x: 0, y: 10}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &832575517
@@ -798,7 +800,7 @@ MonoBehaviour:
   Height: 6
   CellPrefab: {fileID: 1258254489003315472, guid: 913a0b1be4af0674d8022ff3114e8e9f, type: 3}
   InfoLabelPrefab: {fileID: 3168454151338733075, guid: 7b14cfdf6376c1b4b8be18ef54ee3b6b, type: 3}
-  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  defaultColor: {r: 0.26729542, g: 0.8623406, b: 1, a: 1}
   NoiseSource: {fileID: 2800000, guid: 2593a82311ebdce40bad7d0198e7ebf8, type: 3}
 --- !u!4 &1934926445
 Transform:
