@@ -128,6 +128,15 @@ namespace Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseMove"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""e6f727b5-b810-462e-ac4b-fb27d1256b64"",
+                    ""expectedControlType"": ""Delta"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -273,6 +282,39 @@ namespace Input
                     ""action"": ""Click"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""One Modifier"",
+                    ""id"": ""8ec3ee36-bc96-4034-a69c-f244754bdb18"",
+                    ""path"": ""OneModifier"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseMove"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier"",
+                    ""id"": ""5eac8405-8d06-4392-ab5d-ee209f0943e8"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""1576b76b-1f1b-45b1-8307-0bcc682229f1"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""MouseMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -862,6 +904,7 @@ namespace Input
             m_Player_Scroll = m_Player.FindAction("Scroll", throwIfNotFound: true);
             m_Player_Rotate = m_Player.FindAction("Rotate", throwIfNotFound: true);
             m_Player_Click = m_Player.FindAction("Click", throwIfNotFound: true);
+            m_Player_MouseMove = m_Player.FindAction("MouseMove", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -959,6 +1002,7 @@ namespace Input
         private readonly InputAction m_Player_Scroll;
         private readonly InputAction m_Player_Rotate;
         private readonly InputAction m_Player_Click;
+        private readonly InputAction m_Player_MouseMove;
         /// <summary>
         /// Provides access to input actions defined in input action map "Player".
         /// </summary>
@@ -986,6 +1030,10 @@ namespace Input
             /// Provides access to the underlying input action "Player/Click".
             /// </summary>
             public InputAction @Click => m_Wrapper.m_Player_Click;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/MouseMove".
+            /// </summary>
+            public InputAction @MouseMove => m_Wrapper.m_Player_MouseMove;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1024,6 +1072,9 @@ namespace Input
                 @Click.started += instance.OnClick;
                 @Click.performed += instance.OnClick;
                 @Click.canceled += instance.OnClick;
+                @MouseMove.started += instance.OnMouseMove;
+                @MouseMove.performed += instance.OnMouseMove;
+                @MouseMove.canceled += instance.OnMouseMove;
             }
 
             /// <summary>
@@ -1047,6 +1098,9 @@ namespace Input
                 @Click.started -= instance.OnClick;
                 @Click.performed -= instance.OnClick;
                 @Click.canceled -= instance.OnClick;
+                @MouseMove.started -= instance.OnMouseMove;
+                @MouseMove.performed -= instance.OnMouseMove;
+                @MouseMove.canceled -= instance.OnMouseMove;
             }
 
             /// <summary>
@@ -1375,6 +1429,13 @@ namespace Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnClick(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "MouseMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnMouseMove(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

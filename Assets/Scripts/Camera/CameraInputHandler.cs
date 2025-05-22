@@ -19,13 +19,19 @@ namespace Camera
         public float ZoomSpeed = 10f;
 
         // 旋转速度
-        public float RotationSpeed = 50f;
+        public float RotationSpeed = 20f;
 
         // 最小高度
         public float MinHeight = 30f;
 
         // 最大高度
         public float MaxHeight = 80f;
+
+        // 最小俯角
+        public float MinPitch = -80f;
+
+        // 最大仰角
+        public float MaxPitch = 80f;
 
         public Action<Vector3> m_OnClickAction;
 
@@ -69,23 +75,43 @@ namespace Camera
 
         private void Update()
         {
-            HandleRotation();
+            HandleYawAndPitch();
             HandleZoom();
             HandleMovement();
         }
 
-        private void HandleRotation()
+        private void HandleYawAndPitch()
         {
-            var readValue = m_PlayerAction.Rotate.ReadValue<float>();
+            var xyValue = m_PlayerAction.MouseMove.ReadValue<Vector2>();
+            var xValue = xyValue.x;
+            var yValue = xyValue.y;
 
-            if (readValue.Equals(0)) return;
+            if (!Mathf.Approximately(xValue, 0f))
+            {
+                m_CameraTransform.Rotate(
+                    Vector3.up,
+                    xValue * RotationSpeed * Time.deltaTime,
+                    Space.World
+                );
+            }
 
-            m_CameraTransform.Rotate(
-                Vector3.up,
-                readValue * RotationSpeed * Time.deltaTime,
-                Space.World
-            );
+            if (!Mathf.Approximately(yValue, 0f))
+            {
+                var localAngles = m_CameraTransform.localEulerAngles;
+                float currentPitch = localAngles.x > 180f ? localAngles.x - 360f : localAngles.x;
+                float delta = yValue * RotationSpeed * Time.deltaTime;
+
+                float newPitch = currentPitch - delta;
+                newPitch = Mathf.Clamp(newPitch, MinPitch, MaxPitch);
+
+                m_CameraTransform.localEulerAngles = new Vector3(
+                    newPitch,
+                    localAngles.y,
+                    localAngles.z
+                );
+            }
         }
+
 
         private void HandleZoom()
         {
@@ -109,6 +135,8 @@ namespace Camera
 
             var moveDirection = (m_CameraTransform.right * readValue.x + m_CameraTransform.up * readValue.y)
                 .normalized;
+            moveDirection.y = 0;
+
             m_CameraTransform.position += moveDirection * (MoveSpeed * Time.deltaTime);
         }
     }
