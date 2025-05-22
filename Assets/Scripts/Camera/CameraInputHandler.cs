@@ -52,9 +52,11 @@ namespace Camera
 
         private void OnClick(InputAction.CallbackContext context)
         {
+            if (KInput.IsPointerOverUI()) return;
+            
             var mainCamera = KInput.MainCamera;
             if (!mainCamera) return;
-
+            
             var mousePosition = Mouse.current.position.ReadValue();
 
             var inputRay = mainCamera.ScreenPointToRay(new Vector3(mousePosition.x, mousePosition.y, 0f));

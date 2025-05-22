@@ -14,14 +14,12 @@ namespace Map
 
         public HexCell CellPrefab;
         public Text InfoLabelPrefab;
-
+        public static HexMapGenerateSystem Instance;
         public Color defaultColor = Color.white;
-        public Color touchedColor = Color.magenta;
 
         private HexCell[] m_Cells;
         private HexMesh m_HexMesh;
         private Canvas m_InfoCanvas;
-        private CameraInputHandler m_CameraInputHandler;
 
         private void Awake()
         {
@@ -37,22 +35,8 @@ namespace Map
                     CreateCell(x, z, i++);
                 }
             }
-        }
 
-        private void OnEnable()
-        {
-            if (KInput.MainCamera.gameObject.TryGetComponent(out m_CameraInputHandler))
-            {
-                m_CameraInputHandler.m_OnClickAction += TouchCell;
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (m_CameraInputHandler)
-            {
-                m_CameraInputHandler.m_OnClickAction -= TouchCell;
-            }
+            Instance = this;
         }
 
         private void Start()
@@ -73,6 +57,8 @@ namespace Map
             cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
             cell.color = defaultColor;
 
+            SetNeighbors(x, z, i, cell);
+
             var label = Instantiate(InfoLabelPrefab, m_InfoCanvas.transform, false);
 
             label.rectTransform.anchoredPosition =
@@ -80,16 +66,43 @@ namespace Map
             label.text = cell.coordinates.ToStringOnSeparateLines();
         }
 
-        void TouchCell(Vector3 position)
+        private void SetNeighbors(int x, int z, int i, HexCell cell)
+        {
+            if (x > 0)
+            {
+                cell.SetNeighbor(HexDirection.W, m_Cells[i - 1]);
+            }
+
+            if (z > 0)
+            {
+                if ((z & 1) == 0)
+                {
+                    cell.SetNeighbor(HexDirection.SE, m_Cells[i - Width]);
+                    if (x > 0)
+                    {
+                        cell.SetNeighbor(HexDirection.SW, m_Cells[i - Width - 1]);
+                    }
+                }
+                else
+                {
+                    cell.SetNeighbor(HexDirection.SW, m_Cells[i - Width]);
+                    if (x < Width - 1)
+                    {
+                        cell.SetNeighbor(HexDirection.SE, m_Cells[i - Width + 1]);
+                    }
+                }
+            }
+        }
+
+        public void ColorCell(Vector3 position, Color color)
         {
             position = transform.InverseTransformPoint(position);
 
             var coordinates = HexCoordinates.FromPosition(position);
             var index = coordinates.X + coordinates.Z * Width + coordinates.Z / 2;
             var cell = m_Cells[index];
-            cell.color = touchedColor;
+            cell.color = color;
 
-            Debug.Log("touch:" + cell.coordinates);
             m_HexMesh.Triangulate(m_Cells);
         }
     }

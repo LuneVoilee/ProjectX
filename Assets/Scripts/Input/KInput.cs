@@ -1,4 +1,8 @@
-﻿namespace Input
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.EventSystems;
+
+namespace Input
 {
     using UnityEngine;
     using UnityEngine.InputSystem;
@@ -41,5 +45,28 @@
         }
 
         #endregion
+
+        #region UI
+
+        public static bool IsPointerOverUI()
+        {
+            if (!EventSystem.current || !EventSystem.current.IsActive())
+            {
+                return false;
+            }
+
+            var eventData = new PointerEventData(EventSystem.current)
+            {
+                position = Mouse.current.position.ReadValue()
+            };
+
+            var results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventData, results);
+
+            return results.Any();
+        }
+
+        #endregion
+
     }
 }
