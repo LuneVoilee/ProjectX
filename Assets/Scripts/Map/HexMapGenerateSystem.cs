@@ -41,21 +41,26 @@ namespace Map
 
         private void Start()
         {
+            Refresh();
+        }
+
+        public void Refresh()
+        {
             m_HexMesh.Triangulate(m_Cells);
         }
 
         private void CreateCell(int x, int z, int i)
         {
             Vector3 position;
-            position.x = (x + z * 0.5f - z / 2) * (HexConfig.innerRadius * 2f);
+            position.x = (x + z * 0.5f - z / 2) * (HexConfig.InnerRadius * 2f);
             position.y = 0f;
-            position.z = z * (HexConfig.outerRadius * 1.5f);
+            position.z = z * (HexConfig.OuterRadius * 1.5f);
 
             var cell = m_Cells[i] = Instantiate(CellPrefab);
             cell.transform.SetParent(transform, false);
             cell.transform.localPosition = position;
             cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-            cell.color = defaultColor;
+            cell.Color = defaultColor;
 
             SetNeighbors(x, z, i, cell);
 
@@ -64,6 +69,7 @@ namespace Map
             label.rectTransform.anchoredPosition =
                 new Vector2(position.x, position.z);
             label.text = cell.coordinates.ToStringOnSeparateLines();
+            cell.UITransform = label.rectTransform;
         }
 
         private void SetNeighbors(int x, int z, int i, HexCell cell)
@@ -94,16 +100,13 @@ namespace Map
             }
         }
 
-        public void ColorCell(Vector3 position, Color color)
+        public HexCell GetCell(Vector3 position)
         {
             position = transform.InverseTransformPoint(position);
 
             var coordinates = HexCoordinates.FromPosition(position);
             var index = coordinates.X + coordinates.Z * Width + coordinates.Z / 2;
-            var cell = m_Cells[index];
-            cell.color = color;
-
-            m_HexMesh.Triangulate(m_Cells);
+            return m_Cells[index];
         }
     }
 }
