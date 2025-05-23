@@ -1,8 +1,11 @@
+#region
+
 using Camera;
 using Input;
 using Map;
 using UnityEngine;
-using UnityEngine.EventSystems;
+
+#endregion
 
 namespace UI
 {
@@ -12,6 +15,7 @@ namespace UI
 
         private Color m_ActiveColor;
         private int m_ActiveHeight;
+        private int m_BrushSize;
 
         private CameraInputHandler m_CameraInputHandler;
 
@@ -24,7 +28,7 @@ namespace UI
         {
             if (KInput.MainCamera.gameObject.TryGetComponent(out m_CameraInputHandler))
             {
-                m_CameraInputHandler.m_OnClickAction += EditCell;
+                m_CameraInputHandler.OnClickAction += EditCells;
             }
         }
 
@@ -32,11 +36,11 @@ namespace UI
         {
             if (m_CameraInputHandler)
             {
-                m_CameraInputHandler.m_OnClickAction -= EditCell;
+                m_CameraInputHandler.OnClickAction -= EditCells;
             }
         }
 
-        private void EditCell(Vector3 pos)
+        private void EditCells(Vector3 pos)
         {
             var genSystem = HexMapGenerateSystem.Instance;
             if (!genSystem)
@@ -46,9 +50,48 @@ namespace UI
             }
 
             var cell = genSystem.GetCell(pos);
-            cell.Color = m_ActiveColor;
-            cell.Height = m_ActiveHeight;
-            genSystem.Refresh();
+
+            EditCells(cell);
+        }
+
+        private void EditCells(HexCell center)
+        {
+            var centerX = center.coordinates.X;
+            var centerZ = center.coordinates.Z;
+
+            for (int r = 0, z = centerZ - m_BrushSize; z <= centerZ; z++, r++)
+            {
+                for (var x = centerX - r; x <= centerX + m_BrushSize; x++)
+                {
+                    EditCell(new HexCoordinates(x, z));
+                }
+            }
+
+            for (int r = 0, z = centerZ + m_BrushSize; z > centerZ; z--, r++)
+            {
+                for (var x = centerX - m_BrushSize; x <= centerX + r; x++)
+                {
+                    EditCell(new HexCoordinates(x, z));
+                }
+            }
+        }
+
+        private void EditCell(HexCoordinates coordinates)
+        {
+            var genSystem = HexMapGenerateSystem.Instance;
+            if (!genSystem)
+            {
+                Debug.LogError("HexMapGenerateSystem not found");
+                return;
+            }
+
+            var cell = genSystem.GetCell(coordinates);
+
+            if (cell)
+            {
+                cell.Color = m_ActiveColor;
+                cell.Height = m_ActiveHeight;
+            }
         }
 
         public void SelectColor(int index)
@@ -59,6 +102,11 @@ namespace UI
         public void SetHeight(float elevation)
         {
             m_ActiveHeight = (int)elevation;
+        }
+
+        public void SetBrushSize(float size)
+        {
+            m_BrushSize = (int)size;
         }
     }
 }

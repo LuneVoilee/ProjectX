@@ -1,5 +1,9 @@
-﻿using System;
+﻿#region
+
+using System;
 using UnityEngine;
+
+#endregion
 
 namespace Map
 {
@@ -28,12 +32,17 @@ namespace Map
             return X + "\n" + Y + "\n" + Z;
         }
 
-        public static HexCoordinates FromOffsetCoordinates(int x, int z)
+        public static HexCoordinates FromCellOffset(int x, int z)
         {
-            return new HexCoordinates(x, z);
+            return new HexCoordinates(x - z / 2, z);
+        }
+        
+        public static (int x, int z) ToCellOffset(int x, int z)
+        {
+            return (x + z / 2, z);
         }
 
-        public static HexCoordinates FromPosition(Vector3 position)
+        public static HexCoordinates FromCellPosition(Vector3 position)
         {
             var x = position.x / (HexUtil.InnerRadius * 2f);
             var y = -x;

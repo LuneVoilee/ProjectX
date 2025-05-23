@@ -41,10 +41,6 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="D:\UnityProjects\ProjectX_BPR\Library\PackageCache\com.unity.collab-proxy\Lib\Editor\unityplastic.dll" />
-    <Analyzer Include="D:\UnityProjects\ProjectX_BPR\Library\PackageCache\com.unity.collab-proxy\Lib\Editor\log4netPlastic.dll" />
-    <Analyzer Include="D:\UnityProjects\ProjectX_BPR\Library\PackageCache\com.unity.collab-proxy\Lib\Editor\Unity.Plastic.Antlr3.Runtime.dll" />
-    <Analyzer Include="D:\UnityProjects\ProjectX_BPR\Library\PackageCache\com.unity.collab-proxy\Lib\Editor\Unity.Plastic.Newtonsoft.Json.dll" />
     <Analyzer Include="D:\Engine\Unity\6000.0.23f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="D:\Engine\Unity\6000.0.23f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="D:\Engine\Unity\6000.0.23f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
@@ -54,8 +50,11 @@
     <Compile Include="Assets\Scripts\Input\KInput.cs" />
     <Compile Include="Assets\Scripts\Map\HexEnum.cs" />
     <Compile Include="Assets\Scripts\Map\HexCell.cs" />
+    <Compile Include="Assets\Scripts\Tool\Drawer.cs" />
     <Compile Include="Assets\Scripts\Camera\CameraInputHandler.cs" />
+    <Compile Include="Assets\Scripts\Tool\Logger.cs" />
     <Compile Include="Assets\Scripts\Input\KInputAction.cs" />
+    <Compile Include="Assets\Scripts\Map\HexChunk.cs" />
     <Compile Include="Assets\Scripts\Map\HexUtil.cs" />
     <Compile Include="Assets\Scripts\UI\MapEditor.cs" />
     <Compile Include="Assets\Scripts\Map\HexMesh.cs" />
