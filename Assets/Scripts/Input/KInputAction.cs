@@ -137,6 +137,15 @@ namespace Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ShowCoordinates"",
+                    ""type"": ""Button"",
+                    ""id"": ""b136885b-459a-4596-b4b3-b06ccf260d16"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -315,6 +324,17 @@ namespace Input
                     ""action"": ""MouseMove"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""418f7ce2-1172-4340-b244-fabdf08c5968"",
+                    ""path"": ""<Keyboard>/g"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShowCoordinates"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -905,6 +925,7 @@ namespace Input
             m_Player_Rotate = m_Player.FindAction("Rotate", throwIfNotFound: true);
             m_Player_Click = m_Player.FindAction("Click", throwIfNotFound: true);
             m_Player_MouseMove = m_Player.FindAction("MouseMove", throwIfNotFound: true);
+            m_Player_ShowCoordinates = m_Player.FindAction("ShowCoordinates", throwIfNotFound: true);
             // UI
             m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
             m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1003,6 +1024,7 @@ namespace Input
         private readonly InputAction m_Player_Rotate;
         private readonly InputAction m_Player_Click;
         private readonly InputAction m_Player_MouseMove;
+        private readonly InputAction m_Player_ShowCoordinates;
         /// <summary>
         /// Provides access to input actions defined in input action map "Player".
         /// </summary>
@@ -1034,6 +1056,10 @@ namespace Input
             /// Provides access to the underlying input action "Player/MouseMove".
             /// </summary>
             public InputAction @MouseMove => m_Wrapper.m_Player_MouseMove;
+            /// <summary>
+            /// Provides access to the underlying input action "Player/ShowCoordinates".
+            /// </summary>
+            public InputAction @ShowCoordinates => m_Wrapper.m_Player_ShowCoordinates;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -1075,6 +1101,9 @@ namespace Input
                 @MouseMove.started += instance.OnMouseMove;
                 @MouseMove.performed += instance.OnMouseMove;
                 @MouseMove.canceled += instance.OnMouseMove;
+                @ShowCoordinates.started += instance.OnShowCoordinates;
+                @ShowCoordinates.performed += instance.OnShowCoordinates;
+                @ShowCoordinates.canceled += instance.OnShowCoordinates;
             }
 
             /// <summary>
@@ -1101,6 +1130,9 @@ namespace Input
                 @MouseMove.started -= instance.OnMouseMove;
                 @MouseMove.performed -= instance.OnMouseMove;
                 @MouseMove.canceled -= instance.OnMouseMove;
+                @ShowCoordinates.started -= instance.OnShowCoordinates;
+                @ShowCoordinates.performed -= instance.OnShowCoordinates;
+                @ShowCoordinates.canceled -= instance.OnShowCoordinates;
             }
 
             /// <summary>
@@ -1436,6 +1468,13 @@ namespace Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMouseMove(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "ShowCoordinates" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnShowCoordinates(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

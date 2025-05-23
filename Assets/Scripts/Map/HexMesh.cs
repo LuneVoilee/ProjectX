@@ -1,16 +1,21 @@
-﻿using System;
+﻿#region
+
 using System.Collections.Generic;
 using Map;
 using UnityEngine;
+
+#endregion
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class HexMesh : MonoBehaviour
 {
     private Mesh m_Mesh;
-    private List<int> m_Triangles;
-    private List<Vector3> m_Vertices;
+
+    private static readonly List<int> m_Triangles = new();
+    private static readonly List<Vector3> m_Vertices = new();
+    private static readonly List<Color> m_Colors = new();
+
     private MeshCollider m_MeshCollider;
-    private List<Color> m_Colors;
 
     private void Awake()
     {
@@ -18,9 +23,6 @@ public class HexMesh : MonoBehaviour
         m_MeshCollider = gameObject.AddComponent<MeshCollider>();
 
         m_Mesh.name = "Hex Mesh";
-        m_Vertices = new List<Vector3>();
-        m_Triangles = new List<int>();
-        m_Colors = new List<Color>();
     }
 
 
@@ -68,9 +70,6 @@ public class HexMesh : MonoBehaviour
 
     private void AddBridgeAndCorner(HexCell cell, HexDirection dir, EdgeVertices e1)
     {
-        if (cell.coordinates.X == 3 && cell.coordinates.Z == 3)
-            Debug.Log("1");
-
         if (!cell.GetNeighbor(dir, out var neighbor))
             return;
 

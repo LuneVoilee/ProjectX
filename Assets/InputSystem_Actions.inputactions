@@ -49,6 +49,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ShowCoordinates",
+                    "type": "Button",
+                    "id": "b136885b-459a-4596-b4b3-b06ccf260d16",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -227,6 +236,17 @@
                     "action": "MouseMove",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "418f7ce2-1172-4340-b244-fabdf08c5968",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShowCoordinates",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },

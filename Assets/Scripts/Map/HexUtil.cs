@@ -56,6 +56,12 @@ namespace Map
 
         #endregion
 
+        #region Chunk
+
+        public const int ChunkSizeX = 6;
+        public const int ChunkSizeZ = 6;
+
+        #endregion
 
         #region Height
 

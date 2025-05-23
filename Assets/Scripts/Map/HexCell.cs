@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿#region
+
+using UnityEngine;
+
+#endregion
 
 namespace Map
 {
@@ -6,34 +10,59 @@ namespace Map
     {
         public HexCoordinates coordinates;
 
-        public Color Color;
-
         public RectTransform UITransform;
+
+        public HexChunk Chunk;
+
+        [SerializeField] private HexCell[] neighbors;
+
+
+        private int m_Height = int.MinValue;
+
+        public Color Color
+        {
+            get => m_Color;
+            set
+            {
+                if (m_Color == value)
+                {
+                    return;
+                }
+
+                m_Color = value;
+                Refresh();
+            }
+        }
+
+        private Color m_Color;
 
         public int Height
         {
             get => m_Height;
             set
             {
+                if (m_Height == value)
+                {
+                    return;
+                }
+
                 m_Height = value;
-                Vector3 position = transform.localPosition;
+                var position = transform.localPosition;
                 position.y = value * HexUtil.HeightStep;
                 position.y +=
                     (HexUtil.SampleNoise(position).y * 2f - 1f) *
                     HexUtil.HeightPerturbStrength;
                 transform.localPosition = position;
 
-                Vector3 uiPos = UITransform.localPosition;
+                var uiPos = UITransform.localPosition;
                 uiPos.z = m_Height * -HexUtil.HeightStep;
                 UITransform.localPosition = uiPos;
+
+                Refresh();
             }
         }
 
         public Vector3 Position => transform.localPosition;
-
-        private int m_Height;
-
-        [SerializeField] private HexCell[] neighbors;
 
         //NOTICE: 以下方法均没有检查邻居的存在性
         public HexCell GetNeighbor(HexDirection direction)
@@ -66,6 +95,21 @@ namespace Map
             return HexUtil.GetEdgeType(
                 Height, other.Height
             );
+        }
+
+        private void Refresh()
+        {
+            if (Chunk)
+            {
+                Chunk.Refresh();
+                foreach (var neighbor in neighbors)
+                {
+                    if (neighbor && neighbor.Chunk != Chunk)
+                    {
+                        neighbor.Chunk.Refresh();
+                    }
+                }
+            }
         }
     }
 }
